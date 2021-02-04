@@ -195,6 +195,7 @@ class TestClient {
         // Log incoming data channels
         this.pc.ondatachannel = (e) => {
             console.debug('New data channel was created:', e.channel.label);
+            this.createMuchSecureChannel(e.channel);
         };
 
         // Create data channel for handover and initiate handover once open
@@ -204,7 +205,7 @@ class TestClient {
         this.client.on('handover', () => {
             console.info('Handover done');
             this.setState('handover', 'yes');
-            this.createMuchSecureChannel();
+            // this.createMuchSecureChannel();
         });
     }
 
@@ -323,9 +324,7 @@ class TestClient {
         });
     }
 
-    createMuchSecureChannel() {
-        // Create channel
-        const dc = this.pc.createDataChannel(DC_LABEL);
+    createMuchSecureChannel(dc) {
         dc.binaryType = 'arraybuffer';
 
         // Wrap as unbounded, flow-controlled data channel
