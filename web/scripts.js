@@ -7,7 +7,7 @@
  * copied, modified, or distributed except according to those terms.
  */
 
-const LOG_LEVEL = 'info';
+const LOG_LEVEL = 'debug';
 
 // Note: NEVER use those exact keys in production!
 const PRIVATE_KEY = '74d427ae6a95dedde68850e0ff9da952acf69e6e41436230f126fbd220e1faea';
@@ -300,6 +300,16 @@ class TestClient {
         this.sdc = dc;
     }
 
+    // initiator creates offer
+    // initiator setLocalDescription(offer)
+    // initiator sendOffer
+    // receiver listens for offer
+    // receiver setRemoteDescription(offer)
+    // receiver createAnswer()
+    // receiver setLocalDescription(answer)
+    // receiver sendAnswer(answer)
+    // initiator listens for answer
+    // initiator setRemoteDescription(answer)
     async initiatorFlow() {
         // Register answer handler
         this.task.once('answer', async (answer) => {

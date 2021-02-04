@@ -7,12 +7,12 @@
  * copied, modified, or distributed except according to those terms.
  */
 
-const LOG_LEVEL = 'info';
+const LOG_LEVEL = 'debug';
 
 // Note: NEVER use those exact keys in production!
-const PRIVATE_KEY = '74d427ae6a95dedde68850e0ff9da952acf69e6e41436230f126fbd220e1faea';
+const PRIVATE_KEY = 'c41df741435bb144edcd429d1d8e86c5e0e24ccceff87ec5e6647525c2d52077';
 const SERVER_KEY = 'f77fe623b6977d470ac8c7bf7011c4ad08a1d126896795db9d2b4b7a49ae1045';
-const TRUSTED_KEY = '232385faea4c0fca2c867bfb7ca74f634178ee0bc13364ee738e02cd4318e839';
+const TRUSTED_KEY = '424280166304526b4a2874a2270d091071fcc5c98959f7d4718715626df26204';
 const HOST = 'server.saltyrtc.org';
 const PORT = 443;
 const STUN_SERVER = 'stun.l.google.com:19302';
@@ -110,7 +110,7 @@ class TestClient {
             .withTrustedPeerKey(TRUSTED_KEY)
             .withPingInterval(30)
             .usingTasks(tasks)
-            .asInitiator();
+            .asResponder();
         this.client.on('state-change', this.onStateChange.bind(this));
         this.client.on('connection-error', this.onConnectionError.bind(this));
         this.client.on('connection-closed', this.onConnectionClosed.bind(this));
@@ -303,21 +303,24 @@ class TestClient {
     async initiatorFlow() {
         // Register answer handler
         this.task.once('answer', async (answer) => {
-            console.warn('Answer', answer);
-            console.debug('Set remote description');
-            await this.pc.setRemoteDescription(answer.data);
-            console.info('WebRTC initialization done.');
+            console.error('Answer', answer);
         });
 
-        // Create offer
-        console.debug('Create offer');
-        const offer = await this.pc.createOffer();
-        console.warn('Offer', offer);
-        console.debug('Set local description');
-        await this.pc.setLocalDescription(offer);
-        console.debug('Send offer to peer');
-        // noinspection JSCheckFunctionSignatures
-        this.task.sendOffer(offer);
+        this.task.once('offer', async (offer) => {
+            console.warn('Offer', offer);
+            console.debug('Set remote description');
+            await this.pc.setRemoteDescription(offer.data);
+
+            const answer = await this.pc.createAnswer()
+            console.warn('createAnswer', answer);
+            console.debug('Set local description');
+            await this.pc.setLocalDescription(answer);
+
+            console.debug('Send answer to peer');
+            // noinspection JSCheckFunctionSignatures
+            this.task.sendAnswer(answer);
+
+        });
     }
 
     createMuchSecureChannel() {
